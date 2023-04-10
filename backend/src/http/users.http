@@ -1,0 +1,36 @@
+
+# Find All api/user
+GET http://localhost:8080/api/user
+
+###
+# Find User By Id
+GET http://localhost:8080/api/user/1
+
+###
+# Create User
+POST http://localhost:8080/api/user
+Content-Type: application/json
+
+{
+  "email": "asdasd@email.com",
+  "password": "password",
+  "firstname": "John",
+  "lastname": "Doe",
+  "picture": "https://w",
+  "country": "USA",
+  "city": "New York"
+}
+
+###
+# Modify User By Id
+PUT http://localhost:8080/api/user/643301fb61e4f66309695a1b
+Content-Type: application/json
+
+{
+    "email": "ertrth@email.com",
+    "password": "password"
+}
+
+###
+# Delete User By Id
+DELETE http://localhost:8080/api/user/643326cbcb9ab73ddf1122a3

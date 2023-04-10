@@ -1,0 +1,56 @@
+# Find All api/posts
+GET http://localhost:8080/api/posts
+
+###
+
+#Find Post by id
+GET http://localhost:8080/api/posts/1
+
+###
+
+#Create Post
+POST http://localhost:8080/api/posts
+Content-Type: application/json
+
+{
+    "title": "Post 1",
+    "content": "Content 1",
+  "author": "64333fa5bc459946fd9f5e13"
+}
+
+###
+
+#Get Posts of Author by Author Id
+GET http://localhost:8080/api/user/ID/64333fa5bc459946fd9f5e13/posts
+
+###
+
+#Get Posts of Author by Author Email
+GET http://localhost:8080/api/user/Email/example@email.com/posts
+
+###
+
+#Delete Post by id
+DELETE http://localhost:8080/api/posts/1
+
+###
+
+#Update Post by id
+PUT http://localhost:8080/api/posts/6433472a97319e856b8e2e7b
+Content-Type: application/json
+
+{
+    "title": "Post 1",
+    "content": "Content 1"
+}
+
+###
+
+#Update Post Likes by id
+PUT http://localhost:8080/api/posts/6433472a97319e856b8e2e7b/likes
+Content-Type: application/json
+
+{
+    "likes": 10
+}
+
