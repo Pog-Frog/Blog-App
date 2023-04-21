@@ -10,9 +10,6 @@ export class CreatePostDto {
     @IsNotEmpty()
     @MinLength(2)
     public content: string | undefined;
-
-    @IsNotEmpty()
-    public author: string | undefined;
 }
 
 export class UpdatePostDto {

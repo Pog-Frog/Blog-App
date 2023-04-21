@@ -8,18 +8,38 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import {selectAuthState, setToken} from "@/redux/reducers/AuthReducer";
+import {selectAuthState, setToken} from "@/redux/reducers/auth.reducer";
 import {useDispatch, useSelector} from "react-redux";
+import {useRouter} from "next/router";
+import {AuthService} from "@/pages/api/services/auth.service";
+import {showError} from "@/redux/reducers/error.reducer";
+import {User} from "@/pages/api/interfaces/user.interface";
+import {showSuccess} from "@/redux/reducers/success.reducer";
 
 
 export default function SignIn() {
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const router = useRouter();
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+        //@ts-ignore
+        const user: User = {
+            email: data.get('email') as string,
+            password: data.get('password') as string
+        }
+        await AuthService.login(user)
+            .then((response) => {
+                dispatch(showSuccess('You have successfully logged in!'))
+                dispatch(setToken(response.token));
+                router.push({
+                    pathname: '/home',
+                })
+            })
+            .catch((error) => {
+                console.log(error);
+                dispatch(showError(error.message));
+            }
+        )
     };
 
     const dispatch = useDispatch();
@@ -50,6 +70,7 @@ export default function SignIn() {
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        value={router.query.value}
                     />
                     <TextField
                         margin="normal"
@@ -81,13 +102,6 @@ export default function SignIn() {
                     >
                         Sign In
                     </Button>
-                    <Grid item>
-                        <Button onClick={() => {
-                            dispatch(setToken("fake_token"));
-                        }}>
-                            Fake login
-                        </Button>
-                    </Grid>
                 </Box>
             </Box>
         </Container>

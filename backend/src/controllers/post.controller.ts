@@ -2,6 +2,10 @@ import {NextFunction, Response, Request} from "express";
 import {Container} from "typedi";
 import {PostService} from "../services/post.service";
 import {Post} from "../interfaces/post.interface";
+import {verify} from "jsonwebtoken";
+import {JWT_SECRET} from "../config";
+import {DataStoredInToken} from "../interfaces/auth.interface";
+import {UserModel} from "../models/user.model";
 
 export class PostController {
     public post = Container.get(PostService);
@@ -28,6 +32,13 @@ export class PostController {
     public createPost = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const postData: Post = req.body;
+            if (!postData.author) {
+                const token = req.headers.authorization.split(' ')[1];
+                const author_id = await (verify(token, JWT_SECRET)) as DataStoredInToken;
+                const user = await UserModel.findById(author_id);
+                if (!user) res.status(401).json({message: 'Unauthorized'});
+                postData.author = user._id;
+            }
             const createPost: Post = await this.post.createPost(postData);
             res.status(201).json({data: createPost, message: 'created'});
         } catch (error) {

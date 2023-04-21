@@ -1,11 +1,11 @@
 import thunk from 'redux-thunk';
-import {AuthSlice} from './reducers/AuthReducer';
-import {ErrorSlice} from './reducers/ErrorReducer';
+import {AuthSlice} from './reducers/auth.reducer';
+import {ErrorSlice} from './reducers/error.reducer';
 import {configureStore, ThunkAction, Action, combineReducers} from "@reduxjs/toolkit";
 import {createWrapper} from "next-redux-wrapper";
 import {persistReducer, persistStore} from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import {SuccessSlice} from "@/redux/reducers/SuccessReducer";
+import {SuccessSlice} from "@/redux/reducers/success.reducer";
 
 const rootReducer = combineReducers({
     [AuthSlice.name]: AuthSlice.reducer,

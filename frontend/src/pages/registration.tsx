@@ -9,14 +9,19 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import {useDispatch, useSelector} from 'react-redux';
-import {selectErrorState, showError} from '@/redux/reducers/ErrorReducer';
+import {selectErrorState, showError} from '@/redux/reducers/error.reducer';
 import axios from 'axios';
 import {Select} from '@mui/material';
+import {AuthService} from "@/pages/api/services/auth.service";
+import {User} from "@/pages/api/interfaces/user.interface";
+import {showSuccess} from "@/redux/reducers/success.reducer";
+import {useRouter} from "next/router";
+import {useState} from "react";
 
 
-
-const SignUp = () =>{
+const SignUp = () => {
     const dispatch = useDispatch();
+    const router = useRouter();
 
     interface Country {
         index: number;
@@ -24,12 +29,12 @@ const SignUp = () =>{
         cities: string[];
     }
 
-    const [countries, setCountries] = React.useState<Country[]>([]);
-    const [selectedCountry, setSelectedCountry] = React.useState<Country | null>(null);
-    const [selectedCountryIndex, setSelectedCountryIndex] = React.useState<number>(0);
-    const [selectedCountryCities, setSelectedCountryCities] = React.useState<string[]>([]);
-    const [selectedCity, setSelectedCity] = React.useState('');
-    const [loading, setLoading] = React.useState(true);
+    const [countries, setCountries] = useState<Country[]>([]);
+    const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+    const [selectedCountryIndex, setSelectedCountryIndex] = useState<number>(0);
+    const [selectedCountryCities, setSelectedCountryCities] = useState<string[]>([]);
+    const [selectedCity, setSelectedCity] = useState('');
+    const [loading, setLoading] = useState(true);
 
     React.useEffect(() => {
         axios
@@ -87,7 +92,7 @@ const SignUp = () =>{
         return true;
     }
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         if (!verify_name(data.get('firstName') as string, data.get('lastName') as string)) {
@@ -102,14 +107,27 @@ const SignUp = () =>{
         if (!verify_phone(data.get('phone') as string)) {
             return;
         }
-        console.log({
-            firstName: data.get('firstName'),
-            lastName: data.get('lastName'),
-            email: data.get('email'),
-            password: data.get('password'),
-            phone: data.get('phone'),
-            country: selectedCountry,
+        // @ts-ignore
+        const userData: User = {
+            firstname: data.get('firstName') as string,
+            lastname: data.get('lastName') as string,
+            email: data.get('email') as string,
+            password: data.get('password') as string,
             city: selectedCity,
+            country: selectedCountry as unknown as string,
+            picture: 'fake_pictu',
+        };
+        await AuthService.register(userData).then(
+            (response) => {
+                dispatch(showSuccess('User registered successfully'));
+                router.push({
+                    pathname: '/login',
+                    query: {email: userData.email},
+                });
+
+            }
+        ).catch((error) => {
+            dispatch(showError(error.message));
         });
     }
 

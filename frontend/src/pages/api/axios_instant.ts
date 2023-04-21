@@ -1,5 +1,5 @@
 import axois from 'axios';
-import Domain from './Domain';
+import Domain from './domain';
 
 let headers = {
     'Content-Type': 'application/json',
@@ -16,9 +16,8 @@ const axiosInstant = axois.create({
 
 axiosInstant.interceptors.request.use(
     async (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+        if (localStorage.getItem('token')) {
+            config.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
         }
         return config;
     },
@@ -30,6 +29,9 @@ axiosInstant.interceptors.request.use(
 axiosInstant.interceptors.response.use(
     response => response.data,
     err => {
+        if (err?.response?.status === 401) {
+            localStorage.removeItem('token');
+        }
         return Promise.reject(err?.response?.data);
     }
 )

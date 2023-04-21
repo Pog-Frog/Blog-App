@@ -14,11 +14,11 @@ const creatToken = (user: User): TokenData => {
     };
     return {
         expiresIn,
-        token: sign(DataStoredInToken, JWT_SECRET, { expiresIn }),
+        token: sign(DataStoredInToken, JWT_SECRET, {expiresIn}),
     };
 };
 
-const creatCookie = (tokenData: TokenData): string => {
+const creatHTTPCookie = (tokenData: TokenData): string => {
     return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`;
 }
 
@@ -26,30 +26,30 @@ const creatCookie = (tokenData: TokenData): string => {
 export class AuthService {
     public async signup(userData: User): Promise<User> {
         // @ts-ignore
-        const findUser: User = await UserModel.findOne({ email: userData.email });
+        const findUser: User = await UserModel.findOne({email: userData.email});
         if (findUser) throw new HttpException(409, `You're email ${userData.email} already exists`);
 
         const hashedPassword = await hash(userData.password, 10);
         return await UserModel.create({...userData, password: hashedPassword});
     }
 
-    public async login(userData: User): Promise<{ cookie: string; findUser: User }> {
+    public async login(userData: User): Promise<{ findUser: User; cookie: string; tokenData: TokenData }> {
         // @ts-ignore
-        const findUser: User = await UserModel.findOne({ email: userData.email });
+        const findUser: User = await UserModel.findOne({email: userData.email});
         if (!findUser) throw new HttpException(409, `You're email ${userData.email} doesn't exist`);
 
         const isPasswordMatching: boolean = await compare(userData.password, findUser.password);
         if (!isPasswordMatching) throw new HttpException(409, `You're password is not matching`);
 
         const tokenData: TokenData = creatToken(findUser);
-        const cookie: string = creatCookie(tokenData);
+        const cookie: string = creatHTTPCookie(tokenData);
 
-        return { cookie, findUser };
+        return {cookie, findUser, tokenData};
     }
 
     public async logout(userData: User): Promise<User> {
         // @ts-ignore
-        const findUser: User = await UserModel.findOne({ email: userData.email });
+        const findUser: User = await UserModel.findOne({email: userData.email});
         if (!findUser) throw new HttpException(409, `You're email ${userData.email} doesn't exist`);
 
         return findUser;

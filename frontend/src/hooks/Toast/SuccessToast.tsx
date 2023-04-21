@@ -1,6 +1,6 @@
 import { Alert, Snackbar } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import {selectSuccessState, showSuccess} from "@/redux/reducers/SuccessReducer";
+import {selectSuccessState, showSuccess} from "@/redux/reducers/success.reducer";
 
 const SuccessToast = () => {
     const successState = useSelector(selectSuccessState);
